@@ -7,6 +7,12 @@
     <title>ToDo App</title>
 </head>
 <body>
+    <div class="form-container">
+        <form action="/todos/add" method="post">
+            <input type="text" name="description" id="task-description-input">
+            <input type="submit" value="Ajouter">
+        </form>
+    </div>
     <ul>
         {% for d in data %}
         <li>{{ d.description }}</li>
