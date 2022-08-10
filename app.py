@@ -1,5 +1,5 @@
-from urllib import request
-from flask import Flask, render_template, request, redirect, url_for
+import sys
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 
 #Our flask app instance
@@ -17,13 +17,37 @@ class Todo(db.Model):
     def __repr__(self):
         return f'<Todo {self.id} {self.description}>'
 
+# get form request
+# @app.route('/todos/add', methods=['POST'])
+# def getUserInput():
+#     description = request.form.get('description')
+#     todo = Todo(description = description)
+#     db.session.add(todo)
+#     db.session.commit()
+#     return redirect(url_for('index'))
+
+
+#get json request
 @app.route('/todos/add', methods=['POST'])
 def getUserInput():
-    task_descr = request.form.get('description')
-    newTask = Todo(description=task_descr)
-    db.session.add(newTask)
-    db.session.commit()
-    return redirect(url_for('index'))
+    db_error = False
+    body = {}
+    try:
+        description = request.get_json()['description']
+        todo = Todo(description2 = description)
+        db.session.add(todo)
+        db.session.commit()
+        body['description'] = todo.description
+    except:
+        db_error = True
+        db.session.rollback()
+        print(sys.exc_info)
+    finally:
+        db.session.close()
+    if not db_error:
+        return jsonify(body)
+    else : abort(400)
+
 
 
 
