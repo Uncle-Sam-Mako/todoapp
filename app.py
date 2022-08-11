@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 #Our flask app instance
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://uncle-sam:1234@localhost:5432/todoApp'
-
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 #Our database instance
 db = SQLAlchemy(app)
 
@@ -18,35 +18,24 @@ class Todo(db.Model):
         return f'<Todo {self.id} {self.description}>'
 
 # get form request
-# @app.route('/todos/add', methods=['POST'])
-# def getUserInput():
+# @app.route('/todos/create', methods=['POST'])
+# def create_todo():
 #     description = request.form.get('description')
-#     todo = Todo(description = description)
+#     todo = Todo(description=description)
 #     db.session.add(todo)
 #     db.session.commit()
 #     return redirect(url_for('index'))
 
+@app.route('/todos/create', methods=['POST'])
+def create_todo():
+    description = request.get_json()['description']
+    todo = Todo(description=description)
+    db.session.add(todo)
+    db.session.commit()
+    return jsonify({
+        'description': todo.description
+    })
 
-#get json request
-@app.route('/todos/add', methods=['POST'])
-def getUserInput():
-    db_error = False
-    body = {}
-    try:
-        description = request.get_json()['description']
-        todo = Todo(description2 = description)
-        db.session.add(todo)
-        db.session.commit()
-        body['description'] = todo.description
-    except:
-        db_error = True
-        db.session.rollback()
-        print(sys.exc_info)
-    finally:
-        db.session.close()
-    if not db_error:
-        return jsonify(body)
-    else : abort(400)
 
 
 
