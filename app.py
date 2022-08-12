@@ -13,6 +13,7 @@ class Todo(db.Model):
     __tablename = 'todos'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
+    completed = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):
         return f'<Todo {self.id} {self.description}>'
@@ -42,11 +43,41 @@ def create_todo():
         print(sys.exc_info())
     finally:
         db.session.close()
-        if  error == True:
-            abort(400)
-        else:
-            return jsonify(body)
+        if error : 
+          abort(400);
+        return jsonify(body)
 
+#get checkbox request
+@app.route('/todos/<todo_id>/set-completed', methods=['POST'])
+def set_completed_todo(todo_id):
+  try:
+    completed = request.get_json()['completed']
+    todo = Todo.query.get(todo_id)
+    todo.completed = completed
+    db.session.commit()
+  except:
+    db.session.rollback()
+  finally:
+    db.session.close()
+  return redirect(url_for('index'))
+
+
+#get remove request
+@app.route('/todos/<todo_id>/delete_todo', methods=['DELETE'])
+def deleteTask(todo_id):
+  try:
+    deleted = request.get_json()['deleted']
+    todo = Todo.query.get(todo_id)
+    if deleted :
+      db.session.delete(todo) 
+    db.session.commit()
+  except:
+    db.session.rollback()
+  finally:
+    db.session.close()
+  return redirect(url_for('index'))
+
+    
 
 
 
@@ -56,4 +87,4 @@ db.create_all()
 #Rendering function HTML
 @app.route('/')
 def index():
-    return render_template('index.html', data = Todo.query.all())
+  return render_template('index.html', data=Todo.query.order_by('id').all())
