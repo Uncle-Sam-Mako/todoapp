@@ -113,6 +113,11 @@
         .then(function(jsonResponse){
             const liItem = document.createElement('LI');
             liItem.innerHTML = jsonResponse['description'];
+            const checkbox = document.createElement('input');
+            checkbox.className = 'check-completed';
+            checkbox.type = 'checkbox';
+            checkbox.setAttribute('data-id', jsonResponse.id);
+            liItem.appendChild(checkbox);
             console.log(jsonResponse);
             document.getElementById('todos').appendChild(liItem);
         })
