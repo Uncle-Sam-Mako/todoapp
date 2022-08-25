@@ -128,4 +128,8 @@ input.btn{
 }
 .delete-task svg{
     width: 20px;
+    transition: .3s;
+}
+.delete-task svg:hover{
+    transform: rotate(90deg);
 }
