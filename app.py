@@ -6,7 +6,8 @@ from flask_migrate import Migrate
 
 #Our flask app instance
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://uncle-sam:1234@localhost:5432/todoApp'
+app.config[
+    'SQLALCHEMY_DATABASE_URI'] = 'postgresql://uncle-sam:1234@localhost:5432/todoApp'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 #Our database instance
@@ -14,22 +15,25 @@ db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
 
+
 class Todo(db.Model):
     __tablename = 'todos'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
-    list_id = db.Column(db.Integer, db.ForeignKey('todolists.id'), nullable=False)
+    list_id = db.Column(db.Integer,
+                        db.ForeignKey('todolists.id'),
+                        nullable=False)
 
     def __repr__(self):
         return f'<Todo {self.id} {self.description}>'
 
 
 class TodoList(db.Model):
-  __tablename__ = 'todolists'
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(), nullable=False)
-  todos = db.relationship('Todo', backref='list', lazy=True)
+    __tablename__ = 'todolists'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    todos = db.relationship('Todo', backref='list', lazy=True)
 
 
 # get form request
@@ -41,12 +45,13 @@ class TodoList(db.Model):
 #     db.session.commit()
 #     return redirect(url_for('index'))
 
+
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
     error = False
     body = {}
     try:
-        description =  request.get_json()['description']
+        description = request.get_json()['description']
         list_id = request.get_json()['list_id']
         todo = Todo(description=description, list_id=list_id)
         body['description'] = todo.description
@@ -59,56 +64,56 @@ def create_todo():
         print(sys.exc_info())
     finally:
         db.session.close()
-        if error : 
-          abort(400);
+        if error:
+            abort(400)
         return jsonify(body)
+
 
 #get checkbox request
 @app.route('/todos/<todo_id>/set-completed', methods=['POST'])
 def set_completed_todo(todo_id):
-  try:
-    completed = request.get_json()['completed']
-    todo = Todo.query.get(todo_id)
-    todo.completed = completed
-    db.session.commit()
-  except:
-    db.session.rollback()
-  finally:
-    db.session.close()
-  return redirect(url_for('index'))
+    try:
+        completed = request.get_json()['completed']
+        todo = Todo.query.get(todo_id)
+        todo.completed = completed
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('index'))
 
 
 #get remove request
 @app.route('/todos/<todo_id>/delete_todo', methods=['DELETE'])
 def deleteTask(todo_id):
-  try:
-    deleted = request.get_json()['deleted']
-    todo = Todo.query.get(todo_id)
-    if deleted :
-      db.session.delete(todo) 
-    db.session.commit()
-  except:
-    db.session.rollback()
-  finally:
-    db.session.close()
-  return redirect(url_for('index'))
-
-    
-
+    try:
+        deleted = request.get_json()['deleted']
+        todo = Todo.query.get(todo_id)
+        if deleted:
+            db.session.delete(todo)
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('index'))
 
 
 #Execute db transaction
 db.create_all()
 
+
 #Rendering function HTML
 @app.route('/list/<list_id>')
 def get_list_id(list_id):
-  return render_template('index.html', 
-  lists = TodoList.query.all(),
-  active_list = TodoList.query.get(list_id),
-  todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
-  
+    return render_template(
+        'index.html',
+        lists=TodoList.query.all(),
+        active_list=TodoList.query.get(list_id),
+        todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
+
 
 @app.route('/')
 def index():
-  return redirect(url_for('get_list_id', list_id=1))
+    return redirect(url_for('get_list_id', list_id=1))

@@ -1,0 +1,39 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.hidden {
+    display: none;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 300px;
+}
+
+li {
+    width: 100%;
+    background: #fafafa;
+    padding: 5px 10px;
+    border-radius: 60px;
+    margin: 3px;
+    display: flex;
+}
+
+li.removed {
+    display: none;
+}
+
+button {
+    margin-left: auto;
+}
+
+.todo-wrapper,
+.list-wrapper {
+    display: inline-block;
+    padding: 5px;
+}
