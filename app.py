@@ -47,8 +47,10 @@ def create_todo():
     body = {}
     try:
         description =  request.get_json()['description']
-        todo = Todo(description=description)
+        list_id = request.get_json()['list_id']
+        todo = Todo(description=description, list_id=list_id)
         body['description'] = todo.description
+        body['list_id'] = todo.list_id
         db.session.add(todo)
         db.session.commit()
     except:
@@ -101,7 +103,11 @@ db.create_all()
 #Rendering function HTML
 @app.route('/list/<list_id>')
 def get_list_id(list_id):
-  return render_template('index.html', data=Todo.query.filter_by(list_id=list_id).order_by('id').all())
+  return render_template('index.html', 
+  lists = TodoList.query.all(),
+  active_list = TodoList.query.get(list_id),
+  todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
+  
 
 @app.route('/')
 def index():
