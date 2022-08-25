@@ -4,31 +4,41 @@
     <link rel="stylesheet" href="../static/css/style.css">
   </head>
   <body>
-    <div class="list-wrapper">
-      <ul id="list">
-        {% for list in lists %}
-        <li>
-          <a href="/list/{{ list.id }}">{{ list.name }}</a>
-        </li>
-        {% endfor %}
-      </ul>
+    <div class="page-title">
+      <h1>Todo<span>App</span></h1>
     </div>
-    <div class="todo-wrapper">
-      <h4>{{ active_list.name }}</h4>
-      <form id="form" method="post" action="/todos/create">
-        <input type="hidden" name="list_id" id="active_list" value={{ active_list.id }}>
-        <input type="text" id="description" name="description" />
-        <input type="submit" value="Create" />
-      </form>
-      <ul id="todos">
-        {% for todo in todos %}
-        <li>
-          <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
-          {{ todo.description }}
-          <button class="delete-task" data-id="{{ todo.id }}">delete</button>
-        </li>
-        {% endfor %}
-      </ul>
+    <div class="todo-container">
+      <div class="list-wrapper">
+        <ul id="list">
+          {% for list in lists %}
+          <li>
+            <a class="{% if active_list.id == list.id %} active {% endif %} " id="{{ 'list-link' + list.id|string }}" href="/list/{{ list.id }}">{{ list.name }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="todo-wrapper">
+        <h3>{{ active_list.name }}</h3>
+        <form id="form" method="post" action="/todos/create">
+          <input type="hidden" name="list_id" id="active_list" value={{ active_list.id }}>
+          <input type="text" id="description" name="description" placeholder="Learn thing1"/>
+          <input class="btn" type="submit" value="Create" />
+        </form>
+        <ul id="todos">
+          {% for todo in todos %}
+          <li class="todo-item">
+            <input class="check-completed"  id="{{ 'todo-' + todo.id|string }}" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
+            <label for="{{ 'todo-' + todo.id|string }}">{{ todo.description }}</label>
+            <button class="delete-task" data-id="{{ todo.id }}">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m-15 0l15 15" />
+              </svg>
+              
+            </button>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
     <div id="error" class="hidden">Something went wrong!</div>
     <script src="../static/js/main.js"></script>
